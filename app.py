@@ -37,10 +37,11 @@ def upload_pdf():
 def ask():
     user_input = request.json.get("question", "")
     
-    if not pdf_text:
-        context_text = "(No PDF uploaded. Answer normally.) "
+    keywords = ["suman", "linkedin", "github", "skills", "company", "work", "previous", "current"]
+    if any(keyword in user_input.lower() for keyword in keywords) and pdf_text:
+        context_text = f"Context from PDF:\n{pdf_text[:2000]}\n"
     else:
-        context_text = f"Context from PDF:\n{pdf_text[:2000]}\n"  # Limiting text for better processing
+        context_text = "(General knowledge response, not using PDF)"
     
     prompt = f"{context_text}\nUser's question: {user_input}"
     
@@ -61,7 +62,6 @@ def extract_text_from_pdf(pdf_path):
     """Extract text from a PDF file."""
     text = ""
     with pymupdf.open(pdf_path) as doc:
-
         for page in doc:
             text += page.get_text("text") + "\n"
     return text
